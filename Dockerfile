@@ -6,10 +6,10 @@ WORKDIR /app
 COPY package*.json ./
 
 # Cài dependencies production (nếu bạn chỉ cần production)
-RUN npm ci --omit=dev
+RUN npm ci 
 
 # Copy toàn bộ source code vào container
 COPY . .
 
 # Nếu app của bạn chạy file index.js, giữ nguyên dòng dưới. Nếu không, sửa lại cho đúng file chính.
-CMD ["node", "index.js"]
+CMD ["node", "src/bot.js"]
