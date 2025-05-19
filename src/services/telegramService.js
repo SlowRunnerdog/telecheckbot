@@ -5,6 +5,8 @@ const width = 800;
 const height = 600;
 const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height });
 
+const trackingList = [];
+
 function calculateEMA(closes, period = 14) {
     const k = 2 / (period + 1);
     let emaArray = [];
@@ -121,6 +123,43 @@ async function analyzeChartAndBuildImage(coin, timeframe) {
         imageBuffer,
         summary
     };
+}
+
+async function checkTracking(bot) {
+    for (const item of trackingList) {
+        try {
+            const { prediction, imageBuffer, summary } = await analyzeChartAndBuildImage(item.coin, item.timeframe);
+
+            // Điều kiện ví dụ: LONG khi EMA34 > EMA89 và RSI > 55, SHORT khi EMA34 < EMA89 và RSI < 45
+            let signal = null, sl = null, tp = null;
+            if (prediction === 'Uptrend') {
+                signal = 'LONG';
+                sl = 'Dưới hỗ trợ gần nhất';
+                tp = 'Kháng cự gần nhất';
+            } else if (prediction === 'Downtrend') {
+                signal = 'SHORT';
+                sl = 'Trên kháng cự gần nhất';
+                tp = 'Hỗ trợ gần nhất';
+            }
+
+            if (signal) {
+                await bot.sendPhoto(item.chatId, imageBuffer, {
+                    caption: `🔔 *Tín hiệu ${signal} cho ${item.coin} ${item.timeframe}*\n${summary}\n\n*Khuyến nghị:*\n- SL: ${sl}\n- TP: ${tp}`,
+                    parse_mode: 'Markdown'
+                });
+                // Có thể xóa khỏi trackingList nếu chỉ muốn báo 1 lần
+            }
+        } catch (e) {
+            // Bỏ qua lỗi từng coin
+        }
+    }
+}
+
+function addTracking(coin, timeframe, chatId) {
+    // Kiểm tra đã theo dõi chưa
+    if (!trackingList.some(item => item.coin === coin && item.timeframe === timeframe && item.chatId === chatId)) {
+        trackingList.push({ coin, timeframe, chatId });
+    }
 }
 
 module.exports = {

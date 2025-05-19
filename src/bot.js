@@ -2,6 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const { handleCommand } = require('./commands/index');
 const config = require('./config/index');
 const ccxt = require('ccxt');
+const { checkTracking } = require('./services/telegramService');
 
 // Kiểm tra token trước khi khởi tạo bot
 if (!config.TELEGRAM_API_TOKEN) {
@@ -89,3 +90,7 @@ bot.getMe()
     .catch((err) => {
         console.error('Lỗi khi lấy thông tin bot:', err);
     });
+
+setInterval(() => {
+    checkTracking(bot);
+}, 5 * 60 * 1000); // 5 phút

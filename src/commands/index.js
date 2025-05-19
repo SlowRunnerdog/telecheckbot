@@ -1,4 +1,4 @@
-const { analyzeChartAndBuildImage } = require('../services/telegramService');
+const { analyzeChartAndBuildImage, addTracking } = require('../services/telegramService');
 
 async function handleCommand(command, chatId, bot) {
     const [coin, timeframe] = command.split('/');
@@ -7,15 +7,23 @@ async function handleCommand(command, chatId, bot) {
         throw new Error('Invalid command format. Use: coinUSDT/timeframe');
     }
 
+    // Thêm vào danh sách theo dõi
+    addTracking(coin, timeframe, chatId);
+
     try {
-        // Phân tích dữ liệu và tạo ảnh kết quả
         const { prediction, imageBuffer, summary } = await analyzeChartAndBuildImage(coin, timeframe);
 
-        // Gửi ảnh kèm dự đoán và thông tin phân tích cho người dùng
         await bot.sendPhoto(chatId, imageBuffer, {
-            caption: `*Phân tích ${coin} ${timeframe}*\n${summary}\n\n*Dự đoán:* ${prediction}`,
+            caption: `*Phân tích ${coin} ${timeframe}*\n${summary}\n\n*Dự đoán:* ${prediction}\n\nĐã thêm vào danh sách theo dõi. Bot sẽ thông báo khi có tín hiệu tốt!`,
             parse_mode: 'Markdown'
         });
+
+        // Gửi khuyến nghị follow
+        await bot.sendMessage(
+            chatId,
+            `👀 Đã bắt đầu theo dõi *${coin}* khung *${timeframe}* cho bạn!\nBot sẽ tự động gửi tín hiệu LONG/SHORT kèm khuyến nghị SL/TP tối ưu khi có cơ hội tốt.`,
+            { parse_mode: 'Markdown' }
+        );
     } catch (error) {
         console.error('Lỗi phân tích hoặc gửi kết quả:', error);
         await bot.sendMessage(
