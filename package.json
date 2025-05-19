@@ -7,12 +7,12 @@
     "start": "node src/bot.js"
   },
   "dependencies": {
-    "ccxt": "4.2.99",
-    "dotenv": "16.4.5",
-    "node-telegram-bot-api": "0.61.0",
+    "ccxt": "4.4.82",
+    "dotenv": "16.5.0",
+    "node-telegram-bot-api": "0.66.0",
     "technicalindicators": "3.1.0",
-    "chartjs-node-canvas": "4.1.6",
-    "axios": "1.7.2"
+    "chartjs-node-canvas": "5.0.0",
+    "axios": "1.9.0"
   },
   "engines": {
     "node": ">=18"
