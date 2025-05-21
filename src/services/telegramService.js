@@ -162,6 +162,23 @@ function addTracking(coin, timeframe, chatId) {
     }
 }
 
+function removeTracking(coin, timeframe, chatId) {
+    const index = trackingList.findIndex(
+        item => item.coin === coin && item.timeframe === timeframe && item.chatId === chatId
+    );
+    if (index !== -1) {
+        trackingList.splice(index, 1);
+    }
+}
+
+function getTrackingList(chatId) {
+    return trackingList.filter(item => item.chatId === chatId);
+}
+
 module.exports = {
-    analyzeChartAndBuildImage
+    analyzeChartAndBuildImage,
+    addTracking,
+    removeTracking,
+    getTrackingList,
+    checkTracking // thêm dòng này
 };

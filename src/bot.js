@@ -72,14 +72,25 @@ bot.onText(/^[\/!]{1}([A-Z0-9]+USDT)\s+([0-9]+[mhdw])$/i, async (msg, match) => 
 
 bot.on('message', (msg) => {
     const text = msg.text || '';
-    // Nếu không bắt đầu bằng / hoặc ! thì trả về hướng dẫn
-    if (!/^[\/!]/.test(text.trim())) {
-        bot.sendMessage(
-            msg.chat.id,
-            '❗ Lịt moẹ sai cấu trúc rồi bố thêm / hoặc !\n Đề nghị bác thực hiện đúng theo mẫu: `/COINUSDT khung_thời_gian`\nVí dụ: `/BTCUSDT 1h` hoặc `!BTCUSDT 1h`',
-            { parse_mode: 'Markdown' }
-        );
+    const cmd = text.trim().toLowerCase();
+
+    // Ưu tiên xử lý lệnh đặc biệt
+    if (/^(\/?untrack\s+|\/?list\b)/i.test(cmd)) {
+        handleCommand(text, msg.chat.id, bot);
+        return;
     }
+
+    // Nếu là lệnh bắt đầu bằng / hoặc ! và KHÔNG phải untrack/list thì để onText xử lý
+    if (/^[\/!]/.test(cmd)) {
+        return; // Để onText phía dưới xử lý
+    }
+
+    // Nếu không phải lệnh hợp lệ, trả về hướng dẫn
+    bot.sendMessage(
+        msg.chat.id,
+        '❗ Sai cấu trúc. Vui lòng nhập theo mẫu: `/COINUSDT khung_thời_gian`\nVí dụ: `/BTCUSDT 1h` hoặc `!BTCUSDT 1h`',
+        { parse_mode: 'Markdown' }
+    );
 });
 
 // Thông báo khi bot start thành công
